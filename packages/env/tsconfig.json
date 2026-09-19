@@ -1,0 +1,3 @@
+{
+  "extends": "@dwikamekatama/config/tsconfig.base.json"
+}
