@@ -6,7 +6,9 @@ import {
   ChevronLeft,
   ChevronRight,
   ClipboardCheck,
+  Download,
   Factory,
+  FileText,
   ListFilter,
   Mail,
   MapPin,
@@ -14,11 +16,12 @@ import {
   MessageCircle,
   MoveRight,
   Package,
+  Pill,
   Search,
   ShieldCheck,
   Sparkles,
   Users,
-  Workflow,
+  UtensilsCrossed,
   Wrench,
   X,
 } from "lucide-react";
@@ -28,7 +31,7 @@ import type { ReactNode } from "react";
 import { LanguageToggle } from "@/components/language-toggle";
 import { ModeToggle } from "@/components/mode-toggle";
 import { useLanguage, usePageMeta } from "@/i18n/language-provider";
-import { clientLogos, contact, featuredProducts, locations, mapsEmbedFor, navItems, productShowcase, whatsappHrefFor } from "@/data/site";
+import { clientLogos, contact, featuredProducts, locations, mapsEmbedFor, navItems, productCatalogPdf, productShowcase, whatsappHrefFor } from "@/data/site";
 import type { ShowcaseProduct } from "@/data/site";
 
 export function SiteHeader() {
@@ -49,16 +52,18 @@ export function SiteHeader() {
         </button>
 
         <nav id="site-navigation" className={`site-nav ${open ? "is-open" : ""}`} aria-label={t.header.mainNavAria}>
-          {navItems.map((item) => (
-            <Link key={item.to} to={item.to} activeOptions={{ exact: item.to === "/" }} activeProps={{ className: "is-active" }} onClick={() => setOpen(false)}>
-              {t.nav[item.key]}
-            </Link>
-          ))}
+          <div className="site-nav-links">
+            {navItems.map((item) => (
+              <Link key={item.to} to={item.to} activeOptions={{ exact: item.to === "/" }} activeProps={{ className: "is-active" }} onClick={() => setOpen(false)}>
+                {t.nav[item.key]}
+              </Link>
+            ))}
+          </div>
           <div className="header-actions">
             <LanguageToggle />
             <ModeToggle />
           </div>
-          <Link className="header-cta" to="/kontak" onClick={() => setOpen(false)}>
+          <Link className="header-cta" to="/contact" onClick={() => setOpen(false)}>
             {t.header.cta} <ArrowUpRight size={16} />
           </Link>
         </nav>
@@ -77,17 +82,6 @@ export function PageIntro({ eyebrow, title, description, wideTitle = false }: { 
         <p className="page-intro-copy">{description}</p>
       </div>
     </section>
-  );
-}
-
-export function ImagePlaceholder({ label, className = "" }: { label: string; className?: string }) {
-  const { t } = useLanguage();
-  return (
-    <div className={`image-placeholder ${className}`} role="img" aria-label={t.common.imagePlaceholderAria(label)}>
-      <div className="placeholder-grid" />
-      <span className="placeholder-caption">{label}</span>
-      <span className="placeholder-corner">{t.common.projectPhoto}</span>
-    </div>
   );
 }
 
@@ -125,7 +119,7 @@ export function HomePage() {
             <p className="hero-lede">{t.home.lede}</p>
             <div className="hero-actions">
               <InquiryLink />
-              <Link className="text-link" to="/produk">{t.home.seeCapabilities} <MoveRight size={17} /></Link>
+              <Link className="text-link" to="/products">{t.home.seeCapabilities} <MoveRight size={17} /></Link>
             </div>
           <div className="hero-note"><span className="status-dot" /> {t.home.serviceArea}</div>
           </div>
@@ -156,7 +150,7 @@ export function HomePage() {
         </div>
         <div className="intro-statement">
           <p>{renderHighlighted(t.home.whatWeDo.statement)}</p>
-          <Link className="text-link" to="/tentang">{t.home.whatWeDo.link} <ChevronRight size={17} /></Link>
+          <Link className="button button-secondary" to="/about">{t.home.whatWeDo.link} <ChevronRight size={17} /></Link>
         </div>
       </section>
 
@@ -167,7 +161,7 @@ export function HomePage() {
             <h3>{renderHighlighted(t.home.capabilities.title)}</h3>
           </div>
           <p>{renderHighlighted(t.home.capabilities.text)}</p>
-          <Link className="text-link" to="/produk">{t.home.capabilities.link} <MoveRight size={17} /></Link>
+          <Link className="button button-secondary" to="/products">{t.home.capabilities.link} <MoveRight size={17} /></Link>
         </div>
         <div className="capability-list">
           {t.home.capabilities.items.map((item, index) => (
@@ -179,15 +173,36 @@ export function HomePage() {
       <section className="products-preview shell section-rule">
         <div className="section-heading section-heading-row">
           <div><p className="eyebrow">{t.home.workSamples.eyebrow}</p><h2>{t.home.workSamples.title}</h2></div>
-          <Link className="text-link desktop-link" to="/produk">{t.home.workSamples.link} <MoveRight size={17} /></Link>
+          <Link className="text-link desktop-link" to="/products">{t.home.workSamples.link} <MoveRight size={17} /></Link>
         </div>
         <ProductGallery items={featuredProducts} />
-        <Link className="text-link mobile-link" to="/produk">{t.home.workSamples.link} <MoveRight size={17} /></Link>
+        <Link className="text-link mobile-link" to="/products">{t.home.workSamples.link} <MoveRight size={17} /></Link>
+      </section>
+
+      <section className="industries shell section-rule">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">{t.home.industries.eyebrow}</p>
+            <h2>{t.home.industries.title}</h2>
+          </div>
+          <p className="industry-sub">{renderHighlighted(t.home.industries.subtitle)}</p>
+        </div>
+        <div className="industry-grid">
+          {t.home.industries.items.map((industry, index) => {
+            const Icon = industryIcons[index] ?? Factory;
+            return (
+              <article className="industry-card" key={industry.title}>
+                <span className="capability-icon" aria-hidden="true"><Icon size={21} /></span>
+                <h3>{industry.title}</h3>
+              </article>
+            );
+          })}
+        </div>
       </section>
 
       <section className="proof-band shell section-rule">
         <div><p className="eyebrow">{t.home.proof.eyebrow}</p><h2>{t.home.proof.title}</h2></div>
-        <div className="proof-copy"><p>{renderHighlighted(t.home.proof.text)}</p><Link className="text-link" to="/pelanggan">{t.home.proof.link} <MoveRight size={17} /></Link></div>
+        <div className="proof-copy"><p>{renderHighlighted(t.home.proof.text)}</p><Link className="button button-secondary" to="/clients">{t.home.proof.link} <MoveRight size={17} /></Link></div>
       </section>
 
       <InquiryBanner />
@@ -201,7 +216,7 @@ export function AboutPage() {
   const valueIcons = [Sparkles, ShieldCheck, Wrench];
 
   return <main><PageIntro eyebrow={t.about.eyebrow} title={t.about.title} description={t.about.description} wideTitle />
-    <section className="about-story shell section-rule"><div className="story-year"><img className="story-logo" src="/logo.png" alt={t.header.logoAlt} /><p className="story-label">{t.about.identityLabel}</p>2010<span>{t.about.yearCaption}</span></div><div className="story-copy"><p>{t.about.story1}</p><p>{t.about.story2}</p><p>{t.about.story3}</p></div><ImagePlaceholder label={t.about.imageLabel} className="about-image" /></section>
+    <section className="about-story shell section-rule"><div className="story-year"><img className="story-logo" src="/logo.png" alt={t.header.logoAlt} /><p className="story-label">{t.about.identityLabel}</p>2010<span>{t.about.yearCaption}</span></div><div className="story-copy"><p>{t.about.story1}</p><p>{t.about.story2}</p><p>{t.about.story3}</p></div><img className="about-image" src="/workshop.png" alt={t.about.imageLabel} loading="lazy" /></section>
     <section className="about-principles shell section-rule"><div className="section-heading"><p className="eyebrow">{t.about.principles.eyebrow}</p><h2>{t.about.principles.title}</h2></div><div className="principles-grid">
       <article className="principles-block principles-vision"><h3>{t.about.principles.visionTitle}</h3><p>{t.about.principles.visionText}</p></article>
       <article className="principles-block principles-mission"><h3>{t.about.principles.missionTitle}</h3><ul className="principles-list">{t.about.principles.missionItems.map((item) => <li key={item}>{item}</li>)}</ul></article>
@@ -222,8 +237,23 @@ export function ProductsPage() {
   usePageMeta(t.meta.products.title, t.meta.products.description);
 
   return <main><PageIntro eyebrow={t.products.eyebrow} title={t.products.title} description={t.products.description} wideTitle />
-    <section className="product-groups shell section-rule">{t.products.groups.map((group, index) => <article className="product-group" key={group.title}><span className="group-index">0{index + 1}</span><div className="product-group-main"><h2>{group.title}</h2><p>{group.description}</p></div><ul className="product-group-list">{group.items.map((item) => <li key={item}><Check size={16} />{item}</li>)}</ul></article>)}</section>
     <section className="examples shell section-rule"><div className="centered-head"><p className="centered-badge">{t.products.examples.eyebrow}</p><h2>{t.products.examples.title}</h2><p className="centered-sub">{t.products.examples.subtitle}</p></div><ProductGallery items={productShowcase} filterable /></section>
+    <section className="catalog-download shell section-rule" aria-labelledby="catalog-title">
+      <div className="catalog-card">
+        <div className="catalog-copy">
+          <span className="catalog-icon" aria-hidden="true"><FileText size={22} /></span>
+          <div>
+            <p className="eyebrow">{t.products.catalog.eyebrow}</p>
+            <h3 id="catalog-title">{t.products.catalog.title}</h3>
+            <p className="catalog-text">{t.products.catalog.text}</p>
+            <span className="catalog-note">{t.products.catalog.note}</span>
+          </div>
+        </div>
+        <a className="button button-primary" href={productCatalogPdf} download>
+          <Download size={17} /> {t.products.catalog.button}
+        </a>
+      </div>
+    </section>
     <InquiryBanner />
   </main>;
 }
@@ -233,7 +263,7 @@ export function CustomersPage() {
   usePageMeta(t.meta.clients.title, t.meta.clients.description);
 
   return <main><PageIntro eyebrow={t.clients.eyebrow} title={t.clients.title} description={t.clients.description} />
-    <section className="customer-wall shell section-rule"><div className="customer-wall-head"><p className="customer-wall-badge">{t.clients.introEyebrow}</p><h2>{t.clients.introTitleLine1}<br />{t.clients.introTitleLine2}</h2><p className="customer-wall-sub">{t.clients.introTextLine1}<br />{t.clients.introTextLine2}</p></div><div className="logo-grid">{clientLogos.map((logo) => <div className="logo-tile" key={logo.file}><img src={`/clients/${logo.file}`} alt={logo.name} loading="lazy" /><span className="logo-tile-name">{logo.name}</span></div>)}</div></section>
+    <section className="customer-wall shell section-rule"><div className="centered-head"><p className="centered-badge">{t.clients.introEyebrow}</p><h2>{t.clients.introTitleLine1}<br />{t.clients.introTitleLine2}</h2><p className="centered-sub">{t.clients.introTextLine1}<br />{t.clients.introTextLine2}</p></div><div className="logo-grid">{clientLogos.map((logo) => <div className="logo-tile" key={logo.file}><img src={`/clients/${logo.file}`} alt={logo.name} loading="lazy" /><span className="logo-tile-name">{logo.name}</span></div>)}</div></section>
     <section className="customer-note shell section-rule"><ShieldCheck size={24} /><p>{t.clients.note}</p></section>
     <InquiryBanner />
   </main>;
@@ -244,7 +274,7 @@ export function ContactPage() {
   usePageMeta(t.meta.contact.title, t.meta.contact.description);
 
   return <main><PageIntro eyebrow={t.contact.eyebrow} title={t.contact.title} description={t.contact.description} />
-    <section className="contact-grid shell section-rule"><div className="contact-primary"><p className="eyebrow">{t.contact.primaryEyebrow}</p><h2>{t.contact.primaryTitle}</h2><InquiryLink /><p className="contact-placeholder">{t.contact.placeholderNote}</p></div><div className="contact-details"><a href={whatsappHrefFor(t.whatsappMessage)} target="_blank" rel="noreferrer" className="contact-detail"><span className="contact-icon"><MessageCircle size={20} /></span><span><small>WhatsApp</small><strong>{contact.whatsappDisplay}</strong><em>{t.contact.openChat} <ArrowUpRight size={15} /></em></span></a><a href={`mailto:${contact.email}`} className="contact-detail"><span className="contact-icon"><Mail size={20} /></span><span><small>Email</small><strong>{contact.email}</strong><em>{t.contact.writeEmail} <ArrowUpRight size={15} /></em></span></a><div className="contact-detail"><span className="contact-icon"><MapPin size={20} /></span><span><small>{t.contact.serviceBase}</small><strong>Bekasi</strong><em>{t.contact.serviceArea}</em></span></div></div></section>
+    <section className="contact-grid shell section-rule"><div className="contact-primary"><p className="eyebrow">{t.contact.primaryEyebrow}</p><h2>{t.contact.primaryTitle}</h2><InquiryLink /></div><div className="contact-details"><a href={whatsappHrefFor(t.whatsappMessage)} target="_blank" rel="noreferrer" className="contact-detail"><span className="contact-icon"><MessageCircle size={20} /></span><span><small>WhatsApp</small><strong>{contact.whatsappDisplay}</strong><em>{t.contact.openChat} <ArrowUpRight size={15} /></em></span></a><a href={`mailto:${contact.email}`} className="contact-detail"><span className="contact-icon"><Mail size={20} /></span><span><small>Email</small><strong>{contact.email}</strong><em>{t.contact.writeEmail} <ArrowUpRight size={15} /></em></span></a><div className="contact-detail"><span className="contact-icon"><MapPin size={20} /></span><span><small>{t.contact.serviceBase}</small><strong>Bekasi</strong><em>{t.contact.serviceArea}</em></span></div></div></section>
     <section className="contact-locations shell section-rule"><div className="section-heading"><p className="eyebrow">{t.contact.locations.eyebrow}</p><h2>{t.contact.locations.title}</h2></div><div className="location-grid">
       <article className="location-card"><div className="location-head"><span className="location-icon"><MapPin size={20} /></span><h3>{t.contact.locations.officeLabel}</h3></div><p>{locations.office.address}</p><iframe className="location-map" src={mapsEmbedFor(locations.office.lat, locations.office.lng)} title={t.contact.locations.officeLabel} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen /><a className="button button-secondary" href={locations.office.map} target="_blank" rel="noreferrer">{t.contact.locations.openMap} <ArrowUpRight size={16} /></a></article>
       <article className="location-card"><div className="location-head"><span className="location-icon"><MapPin size={20} /></span><h3>{t.contact.locations.workshopLabel}</h3></div><p>{locations.workshop.address}</p><iframe className="location-map" src={mapsEmbedFor(locations.workshop.lat, locations.workshop.lng)} title={t.contact.locations.workshopLabel} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen /><a className="button button-secondary" href={locations.workshop.map} target="_blank" rel="noreferrer">{t.contact.locations.openMap} <ArrowUpRight size={16} /></a></article>
@@ -269,7 +299,8 @@ export function SiteFooter() {
   );
 }
 
-const metricIcons = [CalendarDays, Package, ClipboardCheck, Users, Workflow];
+const metricIcons = [CalendarDays, Package, ClipboardCheck, Users];
+const industryIcons = [Pill, UtensilsCrossed, Sparkles, Factory];
 
 function renderHighlighted(text: string) {
   return text.split("**").map((part, index) => (index % 2 === 1 ? <span className="text-accent" key={`${index}-${part}`}>{part}</span> : part));
@@ -312,7 +343,7 @@ function MetricValue({ value }: { value: string }) {
       if (!startTime) {
         startTime = timestamp;
       }
-      const progress = Math.min((timestamp - startTime) / 1400, 1);
+      const progress = Math.min((timestamp - startTime) / 2600, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
       setDisplay(formatMetricValue(target * eased, suffix, usesKilo));
       if (progress < 1) {
@@ -344,8 +375,14 @@ function ProductGallery({ items, filterable = false }: { items: readonly Showcas
   const [activeGroup, setActiveGroup] = useState<"all" | 0 | 1 | 2>("all");
   const [query, setQuery] = useState("");
 
+  const displayGroups = [1, 0, 2] as const;
+  const sortedItems = [...items].sort((a, b) => {
+    const rankDiff = displayGroups.indexOf(a.group) - displayGroups.indexOf(b.group);
+    return rankDiff !== 0 ? rankDiff : a.name.localeCompare(b.name);
+  });
+
   const normalizedQuery = query.trim().toLowerCase();
-  const visibleItems = items.filter((product) => {
+  const visibleItems = sortedItems.filter((product) => {
     const matchesGroup = activeGroup === "all" || product.group === activeGroup;
     const matchesQuery = normalizedQuery === "" || product.name.toLowerCase().includes(normalizedQuery);
     return matchesGroup && matchesQuery;
@@ -353,30 +390,30 @@ function ProductGallery({ items, filterable = false }: { items: readonly Showcas
 
   const groupOptions: { key: "all" | 0 | 1 | 2; label: string }[] = [
     { key: "all", label: t.products.filterAll },
-    { key: 0, label: t.products.groups[0]?.title ?? "" },
-    { key: 1, label: t.products.groups[1]?.title ?? "" },
-    { key: 2, label: t.products.groups[2]?.title ?? "" },
+    ...displayGroups.map((group) => ({ key: group, label: t.products.groups[group]?.title ?? "" })),
   ];
 
   return (
     <>
       {filterable ? (
         <div className="product-filter" role="group" aria-label={t.products.filterAll}>
-          <span className="product-filter-icon" aria-hidden="true"><ListFilter size={17} /></span>
-          {groupOptions.map((option) => (
-            <button
-              key={option.key}
-              type="button"
-              className={`product-filter-button${activeGroup === option.key ? " is-active" : ""}`}
-              aria-pressed={activeGroup === option.key}
-              onClick={() => {
-                setActiveGroup(option.key);
-                setSelectedIndex(null);
-              }}
-            >
-              {option.label}
-            </button>
-          ))}
+          <div className="product-filter-group">
+            <span className="product-filter-icon" aria-hidden="true"><ListFilter size={17} /></span>
+            {groupOptions.map((option) => (
+              <button
+                key={option.key}
+                type="button"
+                className={`product-filter-button${activeGroup === option.key ? " is-active" : ""}`}
+                aria-pressed={activeGroup === option.key}
+                onClick={() => {
+                  setActiveGroup(option.key);
+                  setSelectedIndex(null);
+                }}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
           <label className="product-search">
             <Search size={15} />
             <input
@@ -396,16 +433,19 @@ function ProductGallery({ items, filterable = false }: { items: readonly Showcas
         <p className="product-empty">{t.products.searchEmpty}</p>
       ) : (
         <div className="product-grid">
-          {visibleItems.map((product, index) => (
-            <button type="button" className={product.tone ? `product-card tone-${product.tone}` : "product-card"} key={product.id} aria-haspopup="dialog" onClick={() => setSelectedIndex(index)}>
-              <div className={`product-card-visual${product.file ? " product-card-visual-photo" : ""}`}>
-                {product.file ? <img src={product.file} alt={product.name} loading="lazy" /> : null}
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <ArrowUpRight size={18} />
-              </div>
-              <div className="product-card-copy"><p>{t.products.groups[product.group]?.title}</p><h3>{product.name}</h3></div>
-            </button>
-          ))}
+          {visibleItems.map((product, index) => {
+            const [firstImage] = product.images ?? [];
+            return (
+              <button type="button" className={product.tone ? `product-card tone-${product.tone}` : "product-card"} key={product.id} aria-haspopup="dialog" onClick={() => setSelectedIndex(index)}>
+                <div className={`product-card-visual${firstImage ? " product-card-visual-photo" : ""}`}>
+                  {firstImage ? <img src={firstImage} alt={product.name} loading="lazy" /> : null}
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  <ArrowUpRight size={18} />
+                </div>
+                <div className="product-card-copy"><p>{t.products.groups[product.group]?.title}</p><h3>{product.name}</h3></div>
+              </button>
+            );
+          })}
         </div>
       )}
       {selectedIndex !== null ? <ProductCarousel items={visibleItems} startIndex={selectedIndex} onClose={() => setSelectedIndex(null)} /> : null}
@@ -470,11 +510,6 @@ function ProductCarousel({ items, startIndex, onClose }: { items: readonly Showc
             <span className="sr-only">{t.products.detail.nextAria}</span>
           </button>
         </div>
-        <div className="product-carousel-dots">
-          {items.map((product, index) => (
-            <button key={product.id} type="button" className={index === slide ? "is-active" : ""} onClick={() => setSlide(index)} aria-label={t.products.detail.slideAria(index + 1)} />
-          ))}
-        </div>
       </div>
     </div>
   );
@@ -482,6 +517,9 @@ function ProductCarousel({ items, startIndex, onClose }: { items: readonly Showc
 
 function ProductSlide({ product, index, isActive }: { product: ShowcaseProduct; index: number; isActive: boolean }) {
   const { t } = useLanguage();
+  const [activeImage, setActiveImage] = useState(0);
+  const images = product.images ?? [];
+  const imageCount = images.length;
   const specific = t.products.detail.items[product.id as keyof typeof t.products.detail.items];
   const groupInfo = t.products.groups[product.group];
   const description = specific?.description ?? groupInfo?.description ?? "";
@@ -489,9 +527,32 @@ function ProductSlide({ product, index, isActive }: { product: ShowcaseProduct; 
 
   return (
     <article className={product.tone ? `product-slide tone-${product.tone}` : "product-slide"} inert={isActive ? undefined : true}>
-      {product.file ? (
+      {imageCount > 0 ? (
         <div className="product-slide-media">
-          <img src={product.file} alt={product.name} loading="lazy" />
+          <div className="product-slide-track" style={{ transform: `translateX(-${activeImage * 100}%)` }}>
+            {images.map((src, imageIndex) => (
+              <div className="product-slide-frame" key={src}>
+                <img src={src} alt={`${product.name} — ${imageIndex + 1}`} loading="lazy" />
+              </div>
+            ))}
+          </div>
+          {imageCount > 1 ? (
+            <>
+              <button type="button" className="product-slide-nav product-slide-nav-prev" onClick={() => setActiveImage((value) => (value - 1 + imageCount) % imageCount)}>
+                <ChevronLeft size={16} />
+                <span className="sr-only">{t.products.detail.prevImageAria}</span>
+              </button>
+              <button type="button" className="product-slide-nav product-slide-nav-next" onClick={() => setActiveImage((value) => (value + 1) % imageCount)}>
+                <ChevronRight size={16} />
+                <span className="sr-only">{t.products.detail.nextImageAria}</span>
+              </button>
+              <div className="product-slide-dots">
+                {images.map((src, imageIndex) => (
+                  <button key={src} type="button" className={imageIndex === activeImage ? "is-active" : ""} onClick={() => setActiveImage(imageIndex)} aria-label={t.products.detail.imageAria(imageIndex + 1)} />
+                ))}
+              </div>
+            </>
+          ) : null}
         </div>
       ) : (
         <div className="product-card-visual product-slide-visual"><span>{String(index + 1).padStart(2, "0")}</span></div>
